@@ -2,13 +2,13 @@
 % Direct particle simulation, 1D particles on a wire
 close all;clear all;clc
 
-N=10;
-L=10;
+N=5;
+L=4;
 
 m_a=4;
 m_b=1;
 
-radius=L/100; %how close particles have to be before we consider collision to have occured. 
+radius=L/10; %how close particles have to be before we consider collision to have occured. 
 
 %A IS THE LARGE PARTICLE
 A_part=zeros(1,N);
@@ -58,7 +58,7 @@ for t_idx=1:n_t
         if i ~=N
             rel_p=pos(i)-pos(i+1);
             rel_v=vel(i)-vel(i+1);
-            tc=-(rel_p+radius)/rel_v; %minus is intentional, write this out with the particles. will see is correct. 
+            tc=(rel_p+radius)/rel_v; %minus is intentional, write this out with the particles. will see is correct. 
             %storage
 
         else %rightmost particle vs wall 
@@ -113,7 +113,7 @@ for t_idx=1:n_t
     
     
     if leftmost_coll_flag
-        pos(min_idx)=0.1*L;
+        pos(min_idx)=radius;
         vel(min_idx)=-vel(min_idx);
     else
         %boozer eq 1.
@@ -127,7 +127,7 @@ for t_idx=1:n_t
    
    
    figure(1)
-   N_plots=5;
+   N_plots=6;
    subplot(N_plots,1,1)
    histogram(vel, 10)
    title('vel hist')
@@ -146,12 +146,24 @@ for t_idx=1:n_t
    
    
    subplot(N_plots,1,5)
+   %MAKES SIZE WITH PARTICLE RADIUS, BOILERPLATE
+   title('particles')
+    s=radius*2; %particle size
+    currentunits = get(gca,'Units');
+    set(gca, 'Units', 'Points');
+    axpos = get(gca,'Position');
+    set(gca, 'Units', currentunits);
+    markerWidth = s/diff(xlim)*axpos(3); % Calculate Marker width in points
+   % BOILERPLATE END
    A_part=logical(A_part);
    scatter(pos(A_part), zeros(1,length(pos(A_part)))); hold on
-   scatter(pos(~A_part), zeros(1,length(pos(~A_part)))); hold off
-   legend('A type', 'B type')
+   scatter(pos(~A_part), zeros(1,length(pos(~A_part)))); hold on
+   scatter(pos(min_idx), 0, 'filled'); hold off
+   %legend('A type', 'B type')
    %min_idx
-   pause(2)
+   subplot(N_plots,1,6)
+   plot(min_tc*vel)
+   pause(0.5)
 %    subplot(N_plots,1,2)
 %    plot(1:t_idx, energy(1:t_idx))
 %     % debug plots
